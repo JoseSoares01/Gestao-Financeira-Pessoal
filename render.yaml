@@ -1,5 +1,14 @@
 # Render deployment configuration
-# Deploy backend and frontend separately in Render dashboard
+# Deploy frontend and backend separately in Render dashboard
+
+# FRONTEND Configuration:
+# - Root Directory: app
+# - Build Command: npm install && npm run build
+# - Publish Directory: dist
+# - Environment: Static Site
+# 
+# IMPORTANT: Configure Routes in Render Dashboard:
+# - Path /* should redirect to /index.html with status 200
 
 # BACKEND Configuration:
 # - Root Directory: backend
@@ -8,8 +17,7 @@
 # - Environment: Node
 # - Auto-deploy: main branch
 
-# FRONTEND Configuration:
-# - Root Directory: app
-# - Build Command: npm install && npm run build
-# - Publish Directory: dist
-# - Environment: Static Site
+routes:
+  - path: /*
+    destination: /index.html
+    status: 200
