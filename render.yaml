@@ -1,27 +1,15 @@
-services:
-  - type: web
-    name: fincontrol-backend
-    env: node
-    plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3001
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_KEY
-        sync: false
-    routes:
-      - path: /api
-        destination: http://localhost:3001/api
+# Render deployment configuration
+# Deploy backend and frontend separately in Render dashboard
 
-  - type: static
-    name: fincontrol-frontend
-    buildCommand: cd app && npm install && npm run build
-    staticPublishPath: app/dist
-    routes:
-      - path: /
-        destination: /index.html
+# BACKEND Configuration:
+# - Root Directory: backend
+# - Build Command: npm install
+# - Start Command: npm start
+# - Environment: Node
+# - Auto-deploy: main branch
+
+# FRONTEND Configuration:
+# - Root Directory: app
+# - Build Command: npm install && npm run build
+# - Publish Directory: dist
+# - Environment: Static Site
