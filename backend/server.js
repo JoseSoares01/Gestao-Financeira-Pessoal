@@ -1,8 +1,14 @@
-const http = require('http');
-const url = require('url');
-const querystring = require('querystring');
+const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
+
+// Inicializar Express
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 // Inicializar cliente Supabase
 const supabase = createClient(
@@ -12,76 +18,70 @@ const supabase = createClient(
 
 const PORT = process.env.PORT || 3001;
 
-// Função auxiliar para adicionar headers CORS
-function addCORSHeaders(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Content-Type', 'application/json');
-}
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
-// Função auxiliar para parsear o corpo da requisição
-function parseBody(req, callback) {
-  let body = '';
-  req.on('data', chunk => {
-    body += chunk.toString();
-  });
-  req.on('end', () => {
-    try {
-      callback(JSON.parse(body));
-    } catch (e) {
-      callback(null);
-    }
-  });
-}
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Servidor de Gestão Financeira ativo' });
+});
 
-// Criar servidor
-const server = http.createServer((req, res) => {
-  addCORSHeaders(res);
-
-  // Lidar com requisições OPTIONS (CORS preflight)
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
-
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
-  const query = parsedUrl.query;
-
-  // Rotas
-  if (pathname === '/' && req.method === 'GET') {
-    res.writeHead(200);
-    res.end(JSON.stringify({ message: 'Servidor de Gestão Financeira ativo' }));
-  } else if (pathname === '/api/health' && req.method === 'GET') {
-    res.writeHead(200);
-    res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }));
-  } else if (pathname === '/api/transactions' && req.method === 'GET') {
-    // Buscar transações
-    res.writeHead(200);
-    res.end(JSON.stringify({ data: [] }));
-  } else if (pathname === '/api/transactions' && req.method === 'POST') {
-    // Criar transação
-    parseBody(req, (data) => {
-      res.writeHead(201);
-      res.end(JSON.stringify({ message: 'Transação criada', data }));
-    });
-  } else if (pathname === '/api/categories' && req.method === 'GET') {
-    // Buscar categorias
-    res.writeHead(200);
-    res.end(JSON.stringify({ data: [] }));
-  } else if (pathname === '/api/goals' && req.method === 'GET') {
-    // Buscar metas
-    res.writeHead(200);
-    res.end(JSON.stringify({ data: [] }));
-  } else {
-    res.writeHead(404);
-    res.end(JSON.stringify({ error: 'Rota não encontrada' }));
+// Transactions routes
+app.get('/api/transactions', async (req, res) => {
+  try {
+    // Retornar transações vazias por enquanto
+    res.json({ data: [] });
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error);
+    res.status(500).json({ error: 'Erro ao buscar transações' });
   }
 });
 
-server.listen(PORT, () => {
+app.post('/api/transactions', (req, res) => {
+  try {
+    const data = req.body;
+    res.status(201).json({ message: 'Transação criada', data });
+  } catch (error) {
+    console.error('Erro ao criar transação:', error);
+    res.status(500).json({ error: 'Erro ao criar transação' });
+  }
+});
+
+// Categories routes
+app.get('/api/categories', async (req, res) => {
+  try {
+    res.json({ data: [] });
+  } catch (error) {
+    console.error('Erro ao buscar categorias:', error);
+    res.status(500).json({ error: 'Erro ao buscar categorias' });
+  }
+});
+
+// Goals routes
+app.get('/api/goals', async (req, res) => {
+  try {
+    res.json({ data: [] });
+  } catch (error) {
+    console.error('Erro ao buscar metas:', error);
+    res.status(500).json({ error: 'Erro ao buscar metas' });
+  }
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Erro:', err);
+  res.status(500).json({ error: 'Erro interno do servidor' });
+});
+
+// Start server
+app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
   console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
 });
