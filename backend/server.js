@@ -1,7 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-const { createClient } = require('@supabase/supabase-js');
 
 // Inicializar Express
 const app = express();
@@ -9,12 +7,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Inicializar cliente Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_KEY || ''
-);
 
 const PORT = process.env.PORT || 3001;
 
