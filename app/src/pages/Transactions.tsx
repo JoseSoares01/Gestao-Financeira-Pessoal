@@ -141,7 +141,7 @@ export default function Transactions() {
             </thead>
             <tbody>
               {filteredTransactions.map((t) => (
-                <tr key={t.id}>
+                <tr key={t.id} style={{ backgroundColor: 'rgba(45, 74, 45, 0.4)' }}>
                   <td>{formatDate(t.date)}</td>
                   <td>
                     <div className="d-flex align-items-center gap-2">
