@@ -1,7 +1,7 @@
 import type { Transaction, Goal } from '../types';
 
 // API Base URL - change this to your backend URL
-const API_URL = import.meta.env.VITE_API_URL || 'https://gestao-financeira-pessoal-arzv.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://gestao-financeira-pessoal-arzv.onrender.com/api';
 
 // Helper function for API calls
 async function fetchAPI(endpoint: string, options?: RequestInit) {
