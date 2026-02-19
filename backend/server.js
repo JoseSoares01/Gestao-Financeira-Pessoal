@@ -60,7 +60,7 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/api/transactions' && req.method === 'GET') {
     // Buscar transações
     res.writeHead(200);
-    res.end(JSON.stringify({ transactions: [] }));
+    res.end(JSON.stringify({ data: [] }));
   } else if (pathname === '/api/transactions' && req.method === 'POST') {
     // Criar transação
     parseBody(req, (data) => {
@@ -70,11 +70,11 @@ const server = http.createServer((req, res) => {
   } else if (pathname === '/api/categories' && req.method === 'GET') {
     // Buscar categorias
     res.writeHead(200);
-    res.end(JSON.stringify({ categories: [] }));
+    res.end(JSON.stringify({ data: [] }));
   } else if (pathname === '/api/goals' && req.method === 'GET') {
     // Buscar metas
     res.writeHead(200);
-    res.end(JSON.stringify({ goals: [] }));
+    res.end(JSON.stringify({ data: [] }));
   } else {
     res.writeHead(404);
     res.end(JSON.stringify({ error: 'Rota não encontrada' }));
