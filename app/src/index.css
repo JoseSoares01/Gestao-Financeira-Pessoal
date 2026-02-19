@@ -1,0 +1,248 @@
+/* Bootstrap is imported in main.tsx */
+
+/* Additional custom styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+/* Ensure text contrast on all backgrounds */
+/* Dark background (default) - white text */
+.bg-dark,
+.custom-card,
+.sidebar,
+.modal-content-custom,
+.form-control-custom,
+.btn-outline-custom {
+  color: #ffffff !important;
+}
+
+/* Light/white background - black text */
+.bg-light,
+.bg-white,
+[class*="bg-light"],
+[class*="bg-white"] {
+  color: #000000 !important;
+}
+
+/* Table cells on dark background */
+.custom-table td,
+.custom-table th {
+  color: #ffffff !important;
+}
+
+/* Form inputs */
+.form-control-custom,
+.form-control-custom::placeholder {
+  color: #ffffff !important;
+}
+
+.form-control-custom option {
+  color: #000000;
+  background: #ffffff;
+}
+
+/* Modal content */
+.modal-content-custom,
+.modal-content-custom .modal-title,
+.modal-content-custom .form-label-custom {
+  color: #ffffff !important;
+}
+
+/* Card titles and text */
+.custom-card h5,
+.custom-card h6,
+.custom-card .text-white {
+  color: #ffffff !important;
+}
+
+/* Ensure all text in cards is white */
+.custom-card * {
+  color: inherit;
+}
+
+.custom-card .text-muted {
+  color: #9ca3af !important;
+}
+
+/* Badge text contrast */
+.badge {
+  color: #ffffff !important;
+}
+
+/* Button text */
+.btn-primary-custom {
+  color: #ffffff !important;
+}
+
+.btn-outline-custom {
+  color: #b8c5b8 !important;
+}
+
+.btn-outline-custom:hover {
+  color: #ffffff !important;
+}
+
+/* Navigation items */
+.nav-item,
+.nav-text {
+  color: #b8c5b8 !important;
+}
+
+.nav-item.active,
+.nav-item.active .nav-text,
+.nav-item:hover,
+.nav-item:hover .nav-text {
+  color: #ffffff !important;
+}
+
+/* Page titles */
+.page-title {
+  color: #ffffff !important;
+}
+
+.page-subtitle {
+  color: #9ca3af !important;
+}
+
+/* Metric values and labels */
+.metric-value,
+.metric-label,
+.metric-subtitle {
+  color: #ffffff !important;
+}
+
+.metric-label {
+  color: #9ca3af !important;
+}
+
+.metric-subtitle {
+  color: #b8c5b8 !important;
+}
+
+/* Transaction items */
+.transaction-title {
+  color: #ffffff !important;
+}
+
+.transaction-meta {
+  color: #9ca3af !important;
+}
+
+/* Category items */
+.category-name {
+  color: #ffffff !important;
+}
+
+.category-amount {
+  color: #ffffff !important;
+}
+
+.category-percent {
+  color: #9ca3af !important;
+}
+
+/* Progress bars */
+.progress-custom {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Form labels */
+.form-label-custom {
+  color: #b8c5b8 !important;
+}
+
+/* Select dropdowns */
+.form-select {
+  color: #ffffff !important;
+  background-color: #2a3f2a !important;
+  border-color: #3d5a3d !important;
+}
+
+.form-select option {
+  color: #000000;
+  background: #ffffff;
+}
+
+/* Input placeholders */
+::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
+}
+
+/* Ensure all inherited text colors */
+h1, h2, h3, h4, h5, h6, p, span, div, a, li, td, th, label {
+  color: inherit;
+}
+
+/* Specific white text for important elements */
+.text-white, .fw-bold, .fw-semibold, strong {
+  color: #ffffff !important;
+}
+
+/* Muted text */
+.text-muted {
+  color: #9ca3af !important;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Form switches custom styling */
+.form-check-input {
+  background-color: #2d4a2d;
+  border-color: #3d5a3d;
+}
+
+.form-check-input:checked {
+  background-color: #7cb342;
+  border-color: #7cb342;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Bootstrap overrides for dark theme */
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d1f0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d4a2d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d5a3d;
+}
