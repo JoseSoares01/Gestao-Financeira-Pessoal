@@ -1,7 +1,13 @@
 import type { Transaction, Goal } from '../types';
 
-// API Base URL - change this to your backend URL
-const API_URL = import.meta.env.VITE_API_URL || 'https://gestao-financeira-pessoal-arzv.onrender.com/api';
+// Base URL do backend (SEM /api)
+// Em produção, configure VITE_API_URL no Render com: https://SEU-BACKEND.onrender.com
+// Em dev, cai no localhost
+const BASE_URL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+
+// Todas as rotas do seu backend começam com /api
+const API_URL = `${BASE_URL}/api`;
 
 // Helper function for API calls
 async function fetchAPI(endpoint: string, options?: RequestInit) {
@@ -32,7 +38,9 @@ export async function getTransactionById(id: string): Promise<Transaction> {
   return response.data;
 }
 
-export async function createTransaction(transaction: Omit<Transaction, 'id'>): Promise<Transaction> {
+export async function createTransaction(
+  transaction: Omit<Transaction, 'id'>
+): Promise<Transaction> {
   const response = await fetchAPI('/transactions', {
     method: 'POST',
     body: JSON.stringify(transaction),
@@ -40,7 +48,10 @@ export async function createTransaction(transaction: Omit<Transaction, 'id'>): P
   return response.data;
 }
 
-export async function updateTransaction(id: string, transaction: Partial<Transaction>): Promise<Transaction> {
+export async function updateTransaction(
+  id: string,
+  transaction: Partial<Transaction>
+): Promise<Transaction> {
   const response = await fetchAPI(`/transactions/${id}`, {
     method: 'PUT',
     body: JSON.stringify(transaction),
@@ -130,8 +141,9 @@ export async function deleteGoal(id: string): Promise<void> {
 }
 
 // ==================== HEALTH CHECK ====================
-
-export async function healthCheck(): Promise<{ status: string; timestamp: string }> {
-  const response = await fetchAPI('/health');
-  return response;
+// Seu backend tem /health (SEM /api). Então aqui não deve usar fetchAPI.
+export async function healthCheck(): Promise<{ ok: boolean; timestamp: string }> {
+  const response = await fetch(`${BASE_URL}/health`);
+  if (!response.ok) throw new Error(`Healthcheck failed: ${response.status}`);
+  return response.json();
 }
