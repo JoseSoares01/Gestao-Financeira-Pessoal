@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
@@ -13,19 +14,23 @@ const allowedOrigins = [
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) {
-      return callback(null, true);
-    }
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS: ' + origin));
-  },
-  credentials: true
-}));
-app.options('/*', cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permite chamadas sem Origin (Postman/curl/healthchecks)
+      if (!origin) return callback(null, true);
+
+      // Permite apenas origens na allowlist
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      return callback(new Error('Not allowed by CORS: ' + origin));
+    },
+    credentials: true
+  })
+);
+
+// ⚠️ Express 5: NÃO use app.options('*'...) ou app.options('/*'...)
+// O middleware cors() já lida com preflight OPTIONS automaticamente.
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
@@ -62,7 +67,7 @@ app.get('/api/transactions', async (req, res) => {
       .from('transactions')
       .select('*')
       .order('date', { ascending: false });
-    
+
     if (error) throw error;
     res.json({ data: data || [] });
   } catch (error) {
@@ -78,7 +83,7 @@ app.get('/api/transactions/:id', async (req, res) => {
       .select('*')
       .eq('id', req.params.id)
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ error: 'Transação não encontrada' });
@@ -97,7 +102,7 @@ app.post('/api/transactions', async (req, res) => {
       .insert([req.body])
       .select()
       .single();
-    
+
     if (error) throw error;
     res.status(201).json({ data });
   } catch (error) {
@@ -114,7 +119,7 @@ app.put('/api/transactions/:id', async (req, res) => {
       .eq('id', req.params.id)
       .select()
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ error: 'Transação não encontrada' });
@@ -134,7 +139,7 @@ app.delete('/api/transactions/:id', async (req, res) => {
       .eq('id', req.params.id)
       .select()
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ error: 'Transação não encontrada' });
@@ -153,31 +158,32 @@ app.get('/api/categories', async (req, res) => {
       .from('categories')
       .select('*')
       .order('name', { ascending: true });
-    
+
     if (error) throw error;
-    
+
     // Format categories with value and percentage based on transactions
     const { data: transactions } = await supabase
       .from('transactions')
       .select('category, amount, type')
       .eq('type', 'expense');
-    
+
     const categoryMap = {};
-    (transactions || []).forEach(t => {
-      if (!categoryMap[t.category]) {
-        categoryMap[t.category] = 0;
-      }
+    (transactions || []).forEach((t) => {
+      if (!categoryMap[t.category]) categoryMap[t.category] = 0;
       categoryMap[t.category] += t.amount;
     });
-    
+
     const totalExpense = Object.values(categoryMap).reduce((a, b) => a + b, 0);
-    
-    const formattedCategories = (data || []).map(cat => ({
+
+    const formattedCategories = (data || []).map((cat) => ({
       ...cat,
       value: categoryMap[cat.name] || 0,
-      percentage: totalExpense > 0 ? ((categoryMap[cat.name] || 0) / totalExpense * 100).toFixed(2) : 0
+      percentage:
+        totalExpense > 0
+          ? (((categoryMap[cat.name] || 0) / totalExpense) * 100).toFixed(2)
+          : 0
     }));
-    
+
     res.json({ data: formattedCategories });
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
@@ -191,33 +197,36 @@ app.get('/api/summary', async (req, res) => {
     const { data: transactions, error } = await supabase
       .from('transactions')
       .select('*');
-    
+
     if (error) throw error;
-    
+
     const txs = transactions || [];
     const totalIncome = txs
-      .filter(t => t.type === 'income')
+      .filter((t) => t.type === 'income')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
+
     const totalExpense = txs
-      .filter(t => t.type === 'expense')
+      .filter((t) => t.type === 'expense')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    
+
     res.json({
       data: {
         totalIncome: parseFloat(totalIncome.toFixed(2)),
         totalExpense: parseFloat(totalExpense.toFixed(2)),
         totalBalance: parseFloat((totalIncome - totalExpense).toFixed(2)),
-        savingsRate: totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome * 100).toFixed(2) : 0,
+        savingsRate:
+          totalIncome > 0
+            ? (((totalIncome - totalExpense) / totalIncome) * 100).toFixed(2)
+            : 0,
         essentialExpenses: parseFloat(
           txs
-            .filter(t => t.type === 'expense' && t.isEssential)
+            .filter((t) => t.type === 'expense' && t.isEssential)
             .reduce((sum, t) => sum + parseFloat(t.amount), 0)
             .toFixed(2)
         ),
         nonEssentialExpenses: parseFloat(
           txs
-            .filter(t => t.type === 'expense' && !t.isEssential)
+            .filter((t) => t.type === 'expense' && !t.isEssential)
             .reduce((sum, t) => sum + parseFloat(t.amount), 0)
             .toFixed(2)
         ),
@@ -236,41 +245,38 @@ app.get('/api/monthly-data', async (req, res) => {
     const { data: transactions, error } = await supabase
       .from('transactions')
       .select('date, amount, type');
-    
+
     if (error) throw error;
-    
+
     const monthlyMap = {};
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    
-    // Initialize months
+
+    // Initialize months (últimos 6 meses)
     for (let i = 0; i < 6; i++) {
       const date = new Date();
       date.setMonth(date.getMonth() - (5 - i));
       const monthIndex = date.getMonth();
       monthlyMap[months[monthIndex]] = { income: 0, expense: 0 };
     }
-    
+
     // Populate data from transactions
-    (transactions || []).forEach(t => {
+    (transactions || []).forEach((t) => {
       const date = new Date(t.date);
       const monthName = months[date.getMonth()];
-      
+
       if (monthlyMap[monthName]) {
-        if (t.type === 'income') {
-          monthlyMap[monthName].income += parseFloat(t.amount);
-        } else {
-          monthlyMap[monthName].expense += parseFloat(t.amount);
-        }
+        if (t.type === 'income') monthlyMap[monthName].income += parseFloat(t.amount);
+        else monthlyMap[monthName].expense += parseFloat(t.amount);
       }
     });
-    
+
     const monthlyData = Object.entries(monthlyMap).map(([month, data]) => ({
       month,
       income: parseFloat(data.income.toFixed(2)),
       expense: parseFloat(data.expense.toFixed(2)),
       balance: parseFloat((data.income - data.expense).toFixed(2))
     }));
-    
+
     res.json({ data: monthlyData });
   } catch (error) {
     console.error('Erro ao buscar dados mensais:', error);
@@ -285,7 +291,7 @@ app.get('/api/goals', async (req, res) => {
       .from('goals')
       .select('*')
       .order('deadline', { ascending: true });
-    
+
     if (error) throw error;
     res.json({ data: data || [] });
   } catch (error) {
@@ -301,7 +307,7 @@ app.post('/api/goals', async (req, res) => {
       .insert([req.body])
       .select()
       .single();
-    
+
     if (error) throw error;
     res.status(201).json({ data });
   } catch (error) {
@@ -318,7 +324,7 @@ app.put('/api/goals/:id', async (req, res) => {
       .eq('id', req.params.id)
       .select()
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ error: 'Meta não encontrada' });
@@ -338,7 +344,7 @@ app.delete('/api/goals/:id', async (req, res) => {
       .eq('id', req.params.id)
       .select()
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return res.status(404).json({ error: 'Meta não encontrada' });
