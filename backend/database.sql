@@ -2,7 +2,6 @@
 -- Run this in your Supabase SQL Editor
 
 -- Enable Row Level Security
-ALTER DATABASE postgres SET "app.settings.jwt_secret" TO 'your-jwt-secret';
 
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
