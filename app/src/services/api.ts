@@ -4,7 +4,7 @@ import type { Transaction, Goal } from '../types';
 // Em produção, configure VITE_API_URL no Render com: https://SEU-BACKEND.onrender.com
 // Em dev, cai no localhost
 const BASE_URL =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+  import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'https://gestao-financeira-pessoal-7s6o.onrender.com';
 
 // Todas as rotas do seu backend começam com /api
 const API_URL = `${BASE_URL}/api`;
